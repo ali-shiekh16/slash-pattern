@@ -5,6 +5,8 @@ import configs from './configuration';
 import renderer, { handleFullScreen, updateRenderer } from './renderer';
 import scene from './scene';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import gsap from 'gsap';
+import { Vector2 } from 'three';
 
 const { sizes } = configs;
 
@@ -23,70 +25,95 @@ const material = new THREE.MeshBasicMaterial({
   color: new THREE.Color(0xc94c4c),
 });
 
-const positions = [];
-const rotations = [];
-
-const planeSize = 0.4;
-let colsCount;
-const rowsCount = (colsCount = 5); // ! Row and column # must be same.
-const countSlashes = rowsCount * colsCount;
-const geometry = new THREE.PlaneGeometry(planeSize, planeSize);
-const slashPattern = new THREE.InstancedMesh(geometry, material, countSlashes);
-
+// const planeSize = 0.4;
+// let colsCount;
+// const rowsCount = (colsCount = 5); // ! Row and column # must be same.
+// const countSlashes = rowsCount * colsCount;
+// const geometry = new THREE.PlaneGeometry(planeSize, planeSize);
+// const slashPattern = new THREE.InstancedMesh(geometry, material, countSlashes);
 // ! space between the slashes
-const margin = 0.1;
-
-const dummy = new THREE.Object3D();
-let rowNo = 1;
-for (let i = 0; i < countSlashes; i++) {
-  if (i >= rowsCount && !(i % rowsCount)) rowNo++;
-
-  dummy.position.set(
-    (i % colsCount) * (planeSize + margin),
-    rowNo * (planeSize + margin),
-    1
-  );
-  dummy.rotation.z = Math.random() * Math.PI * 0.1;
-  dummy.updateMatrix();
-  slashPattern.setMatrixAt(i, dummy.matrix);
-
-  positions.push(new THREE.Vector3().copy(dummy.position));
-  rotations.push(dummy.rotation.z);
-}
-
-const resetPosition = -planeSize * colsCount * 0.3;
-slashPattern.position.set(resetPosition, resetPosition * 2, 0);
-
-scene.add(slashPattern);
+// const margin = 0.1;
+// const dummy = new THREE.Object3D();
+// let rowNo = 1;
+// for (let i = 0; i < countSlashes; i++) {
+//   if (i >= rowsCount && !(i % rowsCount)) rowNo++;
+//   dummy.position.set(
+//     (i % colsCount) * (planeSize + margin),
+//     rowNo * (planeSize + margin),
+//     1
+//   );
+//   dummy.updateMatrix();
+//   slashPattern.setMatrixAt(i, dummy.matrix);
+//   positions.push(new THREE.Vector3().copy(dummy.position));
+// }
+// const resetPosition = -planeSize * colsCount * 0.3;
+// slashPattern.position.set(resetPosition, resetPosition * 2, 0);
+// scene.add(slashPattern);
 
 // Mouse Move
 
+const rowsCount = 20;
+const colsCount = 20;
+const size = 0.3;
+const planesCount = rowsCount * colsCount;
+const planes = new THREE.InstancedMesh(
+  new THREE.PlaneBufferGeometry(size, size / 2),
+  new THREE.MeshBasicMaterial({ color: 0xc94c4c, side: THREE.DoubleSide }),
+  planesCount
+);
+
+const positions = [];
+const dummy = new THREE.Object3D();
+const margin = 0.1;
+
+let rowNo = 1;
+for (let i = 0; i < planesCount; i++) {
+  if (i >= rowsCount && !(i % rowsCount)) rowNo++;
+  dummy.position.set(
+    (i % colsCount) * (size + margin) - 3,
+    rowNo * (size + margin) - 2,
+    1
+  );
+
+  positions.push(new THREE.Vector3().copy(dummy.position));
+
+  dummy.updateMatrix();
+  planes.setMatrixAt(i, dummy.matrix);
+}
+
+scene.add(planes);
+
 const mouse = new THREE.Vector2();
+var vec = new THREE.Vector3(); // create once and reuse
+var pos = new THREE.Vector3(); // create once and reuse
 function handleMouseMove(event) {
   mouse.x = (event.clientX / sizes.width) * 2 - 1;
   mouse.y = -(event.clientY / sizes.height) * 2 + 1;
 
+  vec.set(mouse.x, mouse.y, 0.5);
+  vec.unproject(camera);
+  vec.sub(camera.position).normalize();
+  var distance = -camera.position.z / vec.z;
+  pos.copy(camera.position).add(vec.multiplyScalar(distance));
+
   const dummy = new THREE.Object3D();
-  let rowNo = 1;
-  for (let i = 0; i < countSlashes; i++) {
-    if (i >= rowsCount && !(i % rowsCount)) rowNo++;
-
+  for (let i = 0; i < planesCount; i++) {
     dummy.position.copy(positions[i]);
-    dummy.rotation.z = rotations[i] + -mouse.x * (120 * (Math.PI / 180));
-    dummy.rotation.z = rotations[i] + -mouse.y * (120 * (Math.PI / 180));
+    const angle = Math.atan2(pos.y - positions[i].y, pos.x - positions[i].x);
+    dummy.rotation.z = angle;
     dummy.updateMatrix();
-    slashPattern.setMatrixAt(i, dummy.matrix);
+    planes.setMatrixAt(i, dummy.matrix);
   }
-
-  slashPattern.instanceMatrix.needsUpdate = true;
+  planes.instanceMatrix.needsUpdate = true;
 }
+// scene.add(plane);
 
 window.addEventListener('mousemove', handleMouseMove);
 
 // Setup
 renderer.render(scene, camera);
 
-const controls = new OrbitControls(camera, renderer.domElement);
+// const controls = new OrbitControls(camera, renderer.domElement);
 
 window.addEventListener('resize', () => {
   sizes.width = window.innerWidth;
@@ -103,7 +130,7 @@ const clock = new THREE.Clock();
 function animate() {
   const timeElapsed = clock.getElapsedTime();
   renderer.render(scene, camera);
-  controls.update();
+  // controls.update();
 
   requestAnimationFrame(animate);
 }
