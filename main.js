@@ -87,8 +87,10 @@ const mouse = new THREE.Vector2();
 var vec = new THREE.Vector3(); // create once and reuse
 var pos = new THREE.Vector3(); // create once and reuse
 function handleMouseMove(event) {
-  mouse.x = (event.clientX / sizes.width) * 2 - 1;
-  mouse.y = -(event.clientY / sizes.height) * 2 + 1;
+  const clientX = event.clientX || event.touches[0].clientX;
+  const clientY = event.clientY || event.touches[0].clientY;
+  mouse.x = (clientX / sizes.width) * 2 - 1;
+  mouse.y = -(clientY / sizes.height) * 2 + 1;
 
   vec.set(mouse.x, mouse.y, 0.5);
   vec.unproject(camera);
@@ -109,6 +111,7 @@ function handleMouseMove(event) {
 // scene.add(plane);
 
 window.addEventListener('mousemove', handleMouseMove);
+window.addEventListener('touchmove', handleMouseMove);
 
 // Setup
 renderer.render(scene, camera);
