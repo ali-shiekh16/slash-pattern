@@ -4,9 +4,6 @@ import camera, { updateCamera } from './camera';
 import configs from './configuration';
 import renderer, { handleFullScreen, updateRenderer } from './renderer';
 import scene from './scene';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import gsap from 'gsap';
-import { Vector2 } from 'three';
 
 const { sizes } = configs;
 
@@ -58,7 +55,8 @@ const size = 0.3;
 const planesCount = rowsCount * colsCount;
 const planes = new THREE.InstancedMesh(
   new THREE.PlaneBufferGeometry(size, size / 2),
-  new THREE.MeshBasicMaterial({ color: 0xc94c4c, side: THREE.DoubleSide }),
+  material,
+  // new THREE.MeshBasicMaterial({ color: 0xc94c4c, side: THREE.DoubleSide }),
   planesCount
 );
 
@@ -108,7 +106,6 @@ function handleMouseMove(event) {
   }
   planes.instanceMatrix.needsUpdate = true;
 }
-// scene.add(plane);
 
 window.addEventListener('mousemove', handleMouseMove);
 window.addEventListener('touchmove', handleMouseMove);
