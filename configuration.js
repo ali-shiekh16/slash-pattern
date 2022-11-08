@@ -1,8 +1,8 @@
 const configurations = {
   maxPixelRatio: 2,
   sizes: {
-    rendererWidth: window.innerWidth,
-    rendererHeight: window.innerHeight,
+    rendererWidth: 500,
+    rendererHeight: 500,
 
     get width() {
       return this.rendererWidth;
