@@ -19,9 +19,17 @@ body {
 }
 
 canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
   outline: none;
-  border: solid #c94c3c 2px;
+}
+
+.container {
+  border: solid #c94c4c 2px;
+  display: flex;
+  column-gap: 2rem;
+  padding: 2rem;
+}
+
+.container__heading {
+  font-size: 3rem;
+  align-self: center;
 }
