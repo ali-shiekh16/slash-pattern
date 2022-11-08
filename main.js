@@ -54,7 +54,7 @@ const colsCount = 20;
 const size = 0.3;
 const planesCount = rowsCount * colsCount;
 const planes = new THREE.InstancedMesh(
-  new THREE.PlaneBufferGeometry(size, size / 2),
+  new THREE.PlaneBufferGeometry(size, size),
   material,
   // new THREE.MeshBasicMaterial({ color: 0xc94c4c, side: THREE.DoubleSide }),
   planesCount
