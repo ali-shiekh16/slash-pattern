@@ -115,16 +115,16 @@ renderer.render(scene, camera);
 
 // const controls = new OrbitControls(camera, renderer.domElement);
 
-window.addEventListener('resize', () => {
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
+// window.addEventListener('resize', () => {
+//   sizes.width = window.innerWidth;
+//   sizes.height = window.innerHeight;
 
-  updateCamera(sizes.width, sizes.height);
-  updateRenderer(sizes.width, sizes.height);
-  renderer.render(scene, camera);
-});
+//   updateCamera(sizes.width, sizes.height);
+//   updateRenderer(sizes.width, sizes.height);
+//   renderer.render(scene, camera);
+// });
 
-window.addEventListener('dblclick', handleFullScreen);
+// window.addEventListener('dblclick', handleFullScreen);
 
 const clock = new THREE.Clock();
 function animate() {
